@@ -16,6 +16,7 @@ Link: [@Everyday_Oracle_Bot](https://t.me/Everyday_Oracle_Bot)
 
 ## About this bot
 ...
+(currently only localized for Russian language)
 
 ## Creators
 @DanielSolmann - maintainer
