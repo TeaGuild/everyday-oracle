@@ -4,10 +4,12 @@ from platform import platform
 from enum import Enum
 from typing import List, Optional
 
+
 class ForecastType(Enum):
     binary = "binary"
     time_guess = "time"
     unknown = "unk"
+
 
 @dataclass
 class ForecastCommonData:
@@ -29,9 +31,11 @@ class MetaculusCommunityFullPrediction:
     q2: int
     q3: int
 
+
 @dataclass
 class MetaculusCommunityPrediction:
     full: MetaculusCommunityFullPrediction
+
 
 @dataclass
 class ForecastMetaculusData(ForecastCommonData):
@@ -43,4 +47,3 @@ class ForecastMetaculusData(ForecastCommonData):
 
     close_time: datetime
     resolve_time: datetime
-    

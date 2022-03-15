@@ -1,8 +1,10 @@
 from typing import List
 from models import ForecastType
 
+
 class ForecasterQuestionTypeNotSupported(NotImplementedError):
     pass
+
 
 class BaseForecaster:
     name: str
@@ -12,7 +14,6 @@ class BaseForecaster:
 
     def get_prediction(self, q_id, *args, **kwargs):
         raise NotImplementedError
-    
+
     def search(self, s, *args, **kwargs):
         raise NotImplementedError
-
