@@ -1,4 +1,3 @@
-from ast import parse
 from typing import List, Optional
 from forecasters import BaseForecaster, ForecasterQuestionTypeNotSupported
 from models import (
