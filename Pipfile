@@ -11,6 +11,7 @@ pytz = "*"
 python-dateutil = "*"
 httpx = {extras = ["http2"], version = "*"}
 python-dotenv = "*"
+loguru = "*"
 
 [dev-packages]
 black = "*"

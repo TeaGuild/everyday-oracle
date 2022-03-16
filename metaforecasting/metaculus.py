@@ -1,7 +1,6 @@
-from ast import parse
 from typing import List, Optional
-from forecasters import BaseForecaster, ForecasterQuestionTypeNotSupported
-from models import (
+from metaforecasting.forecasters import BaseForecaster
+from metaforecasting.models import (
     ForecastMetaculusData,
     ForecastType,
     MetaculusCommunityFullPrediction,
@@ -9,9 +8,7 @@ from models import (
 )
 import httpx
 from dateutil import parser as dt_parser
-
-METACULUS_URL = "https://www.metaculus.com"
-TIME_FORMAT = "%d.%m.%Y %H:%M"
+from loguru import logger
 
 
 class MetaculusIDNotFound(BaseException):
@@ -19,8 +16,12 @@ class MetaculusIDNotFound(BaseException):
 
 
 class MetaculusForecaster(BaseForecaster):
+    def __init__(self, metaculus_url="https://www.metaculus.com"):
+        logger.info(f"Initiated `MetaculusForecaster` with URL: {metaculus_url}")
+        self.url = metaculus_url
+
     def _get_raw_metaculus(self, q_id: int):
-        a = httpx.get(f"{METACULUS_URL}/api2/questions/{q_id}", follow_redirects=True)
+        a = httpx.get(f"{self.url}/api2/questions/{q_id}", follow_redirects=True)
         if a.status_code == 404:
             raise MetaculusIDNotFound
 
@@ -36,6 +37,7 @@ class MetaculusForecaster(BaseForecaster):
             forecast_type = ForecastType.binary
 
         else:
+            logger.debug(f"Ignoring this data, cuz it's {metaculus_pos['type']}")
             # we should implement other types sooner
             return None
 
@@ -51,7 +53,7 @@ class MetaculusForecaster(BaseForecaster):
                 )
             )
         except KeyError:
-            print(f"No keys on {raw['id']}")
+            logger.debug(f"No keys on {raw['id']}")
             prediction = None  # TODO: fix crutch
 
         data = ForecastMetaculusData(
@@ -59,7 +61,7 @@ class MetaculusForecaster(BaseForecaster):
             id_on_platform=raw["id"],
             forecast_type=forecast_type,
             question_title=raw["title"],
-            question_url=f'{METACULUS_URL}{raw["page_url"]}',
+            question_url=f'{self.url}{raw["page_url"]}',
             created_time=dt_parser.parse(raw["created_time"]),
             votes=raw["votes"],
             activity=raw["activity"],
@@ -71,18 +73,6 @@ class MetaculusForecaster(BaseForecaster):
 
         return data
 
-    def format_as_html(self, data: ForecastMetaculusData) -> str:
-        return (
-            f"<b>{data.question_title}</b> (ID: {data.id_on_platform})\n"
-            f'<a href="{data.question_url}">Ссылка</a>\n\n'
-            f"🔮 Текущие вероятности (q1, q2, q3): <b>"
-            f"{data.community_prediction.full.q1}%, {data.community_prediction.full.q2}%, "
-            f"{data.community_prediction.full.q3}% </b>\n\n"
-            f"⏱ Время закрытия вопроса: <b>{data.close_time.strftime(TIME_FORMAT)}</b>\n"
-            f"🔔 Время завершения события: <b>{data.resolve_time.strftime(TIME_FORMAT)}</b>\n"
-            f"👤 Всего предсказаний сообщества: <b>{data.total_predictions}</b>"
-        )
-
     def search(
         self, s: str, display_popular: bool = True, limit: int = 10, offset: int = 0
     ) -> List[ForecastMetaculusData]:
@@ -91,5 +81,5 @@ class MetaculusForecaster(BaseForecaster):
             return []
         if s != "":
             params["search"] = s
-        a = httpx.get(f"{METACULUS_URL}/api2/questions/", params=params)
+        a = httpx.get(f"{self.url}/api2/questions/", params=params)
         return list([self.format_prediction(i) for i in a.json()["results"]])
