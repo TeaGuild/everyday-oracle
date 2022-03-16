@@ -131,7 +131,7 @@ def inline_query(update: Update, context: CallbackContext) -> None:
                 logger.debug(f"Exception during search, '{query}', '{e}'")
         logger.debug(f"Search report formed, ready to send, '{query}'")
 
-    update.inline_query.answer(results)
+    update.inline_query.answer(results, cache_time=60, is_personal=True)
 
 
 logger.debug("Adding handlers...")
