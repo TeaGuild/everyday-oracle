@@ -55,7 +55,7 @@ def current(update: Update, context: CallbackContext):
     cmd = update.message.text.split()
     logger.info(
         f"{cmd} from {update.effective_user.id}:{update.effective_user.name} in {update.message.chat_id}"
-    )
+    )  # I should probably restrict an amount of logged data. And move all logins and names to default log cfg.
     if len(cmd) != 2:
         update.message.reply_markdown_v2(
             "Повторите команду в формате `/current <id вопроса на метакулусе>`"
