@@ -53,7 +53,9 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def current(update: Update, context: CallbackContext):
     cmd = update.message.text.split()
-    logger.info(f"{cmd} from {update.effective_user.id}:{update.effective_user.name}")
+    logger.info(
+        f"{cmd} from {update.effective_user.id}:{update.effective_user.name} in {update.message.chat_id}"
+    )
     if len(cmd) != 2:
         update.message.reply_markdown_v2(
             "Повторите команду в формате `/current <id вопроса на метакулусе>`"
